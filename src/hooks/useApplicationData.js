@@ -78,9 +78,12 @@ export default function useApplicationData(){
 
   function cancelInterview(id) {
     let appointments = {...state.appointments};
-    appointments[id].interview = null;
+    
     return axios.delete(`/api/appointments/${id}`)
-    .then(() => dispatch({ type: SET_REMOVE_INTERVIEW, value: { appointments }}))
+    .then(() => {
+      appointments[id].interview = null;
+      dispatch({ type: SET_REMOVE_INTERVIEW, value: { appointments }})
+    })
   };
 
   return {state, setDay, bookInterview, cancelInterview};

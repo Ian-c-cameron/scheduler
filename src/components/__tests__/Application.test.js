@@ -137,7 +137,59 @@ describe("Application", () => {
     expect(getByText(day,"1 spot remaining")).toBeInTheDocument();
   });
 
+  it("shows the delete error when failing to delete an existing appointment", async () => {
+    axios.delete.mockRejectedValueOnce({
+      status: 500,
+      statusText: "Internal Server Error"
+    });
 
+    // 1. Render the Application.
+    const { container } = render(<Application />);
+
+    // 2. Wait until the text "Archie Cohen" is displayed.
+    await waitForElement(() => getByText(container, "Archie Cohen"));
+    
+    const appointment = getAllByTestId(container, "appointment").find(appointment =>
+      queryByText(appointment, "Archie Cohen")
+    );
+
+    // 3. Click the alt="Delete" button on the first booked appointment.
+    fireEvent.click(getByAltText(appointment, "Delete"));
+
+    // 4. Check that "Delete the appointment?" shown
+    expect(getByText(appointment,"Delete the appointment?")).toBeInTheDocument();
+
+    // 5. click the Cancel button.
+    fireEvent.click(getByText(appointment, "Cancel"));
+
+    // 6. confirm that the booked appointment is back and spots remaining hasn't changed
+    expect(getByText(appointment,"Archie Cohen")).toBeInTheDocument();
+
+    // 7. repeat step 3 and 4
+    fireEvent.click(getByAltText(appointment, "Delete"));
+    expect(getByText(appointment,"Delete the appointment?")).toBeInTheDocument();
+
+    // 8. Click the Confirm button.
+    fireEvent.click(getByText(appointment, "Confirm"));
+
+    // 9. Check that the element with the text "Deleting" is displayed.
+    expect(getByText(appointment,"Deleting")).toBeInTheDocument();
+
+    // 10. Wait until the error is displayed when delete fails.
+    await waitForElement(() => getByText(appointment, "Could not delete appointment."));
+
+    // 9. click close button
+    fireEvent.click(getByAltText(appointment, "Close"));
+
+    //10. verify that the appointment is in show mode
+    expect(getByText(container ,"Archie Cohen")).toBeInTheDocument();
+
+    // 11. check that the number of spots hasn't changed
+    const day = getAllByTestId(container, "day").find(day =>
+      queryByText(day, "Monday")
+    );
+    expect(getByText(day,"1 spot remaining")).toBeInTheDocument();
+  });
 
   it("loads data, cancels an interview and increases the spots remaining for Monday by 1", async () => {
     // 1. Render the Application.
@@ -185,59 +237,7 @@ describe("Application", () => {
     expect(getByText(day,"2 spots remaining")).toBeInTheDocument();
   });
   
-  it("shows the delete error when failing to delete an existing appointment", async () => {
-    axios.delete.mockRejectedValueOnce({
-      status: 500,
-      statusText: "Internal Server Error"
-    });
-
-    // 1. Render the Application.
-    const { container } = render(<Application />);
-
-    // 2. Wait until the text "Archie Cohen" is displayed.
-    await waitForElement(() => getByText(container, "Archie Cohen"));
-    
-    const appointment = getAllByTestId(container, "appointment").find(appointment =>
-      queryByText(appointment, "Archie Cohen")
-    );
-
-    // 3. Click the alt="Delete" button on the first booked appointment.
-    fireEvent.click(getByAltText(appointment, "Delete"));
-
-    // 4. Check that "Delete the appointment?" shown
-    expect(getByText(appointment,"Delete the appointment?")).toBeInTheDocument();
-
-    // 5. click the Cancel button.
-    fireEvent.click(getByText(appointment, "Cancel"));
-
-    // 6. confirm that the booked appointment is back and spots remaining hasn't changed
-    expect(getByText(appointment,"Archie Cohen")).toBeInTheDocument();
-
-    // 7. repeat step 3 and 4
-    fireEvent.click(getByAltText(appointment, "Delete"));
-    expect(getByText(appointment,"Delete the appointment?")).toBeInTheDocument();
-
-    // 8. Click the Confirm button.
-    fireEvent.click(getByText(appointment, "Confirm"));
-
-    // 9. Check that the element with the text "Deleting" is displayed.
-    expect(getByText(appointment,"Deleting")).toBeInTheDocument();
-
-    // 10. Wait until the error is displayed when delete fails.
-    await waitForElement(() => getByText(appointment, "Could not delete appointment."));
-
-    // 9. click close button
-    fireEvent.click(getByAltText(appointment, "Close"));
-
-    //10. verify that the appointment is in show mode
-    expect(getByText(appointment,"Archie Cohen")).toBeInTheDocument();
-
-    // 11. check that the number of spots hasn't changed
-    const day = getAllByTestId(container, "day").find(day =>
-      queryByText(day, "Monday")
-    );
-    expect(getByText(day,"1 spot remaining")).toBeInTheDocument();
-  });
+  
 
 });
 
