@@ -16,15 +16,8 @@ export default function useApplicationData(){
         return {...state, ...action.value};
       },
       SET_ADD_INTERVIEW(state, action) {
-        let days = state.days.map((day) => {
-          if (day.name === state.day) {
-            return {...day, spots: (day.spots - 1)}
-          }
-          return {...day};
-        });
         return {
           ...state,
-          days,
           ...action.value
         }
       },
@@ -60,16 +53,27 @@ export default function useApplicationData(){
   }, []);
 
   function bookInterview(id, interview) {
+    const value = {}
+    if (!state.appointments[id].interview) {
+      value.days = state.days.map((day) => {
+        if (day.name === state.day) {
+          return {...day, spots: (day.spots - 1)}
+        }
+        return {...day};
+      });
+    }
+    
     const appointment = {
       ...state.appointments[id],
       interview: { ...interview }
     };
-    const appointments = {
+    
+    value.appointments = {
       ...state.appointments,
       [id]: appointment
     };
     return axios.put(`/api/appointments/${id}`, appointment)
-      .then(() => dispatch({ type: SET_ADD_INTERVIEW, value: { appointments }}))
+      .then(() => dispatch({ type: SET_ADD_INTERVIEW, value}))
   };
 
   function cancelInterview(id) {
