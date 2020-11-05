@@ -2,6 +2,8 @@ import React from "react";
 import classNames from "classnames"
 import "components/DayListItem.scss";
 
+//element displays a day of the week with
+//the number of interview spots remaining
 export default function DayListItem(props) {
   const dayListClasses = classNames("day-list__item",{
     "day-list__item--selected": props.selected,

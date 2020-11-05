@@ -1,5 +1,6 @@
 import React from "react";
 
+//element displays the time and divider between appointments
 export default function Header(props) {
   return (
     <header className="appointment__time">

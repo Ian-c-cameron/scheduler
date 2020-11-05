@@ -2,31 +2,34 @@ import React, { useState } from "react";
 import InterviewerList from "../InterviewerList";
 import Button from "../Button";
 
-// name:String
-// interviewers:Array
-// interviewer:Number
-// onSave:Function
-// onCancel:Function
-
-// interviewers:Array
-// onSave:Function
-// onCancel:Function
-
+//element displays the form for creating a new appointment
 export default function Form(props) {
+  //the contents of the name input field
   const [ name, setName ] = useState(props.name || "");
+  //the currently selected interviewer's id
   const [ interviewer, setInterviewer ] = useState(props.interviewer || null);
+  //the error message should one need to be displayed
   const [error, setError] = useState("");
 
+  /**
+   * reset - reset form values if the user cancels
+   */
   const reset = function() {
     setName("");
     setInterviewer(null);
   }
 
+  /**
+   * cancel - handle when the user clicks cancel
+   */
   const cancel = function() {
     reset();
     props.onCancel();
   }
 
+  /**
+   * validate - checks that the user has entered a name before saving
+   */
   function validate() {
     if (name === "") {
       setError("Student name cannot be blank");

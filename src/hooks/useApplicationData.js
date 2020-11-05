@@ -1,45 +1,24 @@
 import { useReducer, useEffect } from "react";
 import axios from "axios";
 
-const SET_DAY = "SET_DAY";
-const SET_APPLICATION_DATA = "SET_APPLICATION_DATA";
-const SET_ADD_INTERVIEW = "SET_ADD_INTERVIEW";
-const SET_REMOVE_INTERVIEW = "SET_REMOVE_INTERVIEW";
-
+/**
+ * useApplicationData - a custom hook for managing
+ * main site data and maintaining consistency with the server 
+ */
 export default function useApplicationData(){
+  /**
+   * reducer - reducer function for using useReducer to manage site state
+   * @param {*} state - the current site state
+   * @param {*} action - the data that needs to change
+   */
   function reducer(state, action) {
-    const reducers = {
-      SET_DAY(state, action) {
-        return { ...state, ...action.value };
-      },
-      SET_APPLICATION_DATA(state, action) {
-        return {...state, ...action.value};
-      },
-      SET_ADD_INTERVIEW(state, action) {
-        return {
-          ...state,
-          ...action.value
-        }
-      },
-      SET_REMOVE_INTERVIEW(state, action) {
-        let days = state.days.map((day) => {
-          if (day.name === state.day) {
-            return {...day, spots: (day.spots + 1)}
-          }
-          return {...day};
-        });
-        return {
-          ...state,
-          days,
-          ...action.value
-        }
-      }
-    }
-    return reducers[action.type](state, action) || state;
+    return { ...state, ...action.value } || state;
   }
-  const [state, dispatch] = useReducer(reducer, {days: [], day: "Monday", appointments: {}, interviewers: {}});
-  const setDay = day => dispatch({ type: SET_DAY, value: { day } });
 
+  //state - the main site data
+  const [state, dispatch] = useReducer(reducer, {days: [], day: "Monday", appointments: {}, interviewers: {}});
+  
+  //Load all initial site data
   useEffect(() => {
     Promise.all([
       axios.get("/api/days"),
@@ -47,42 +26,74 @@ export default function useApplicationData(){
       axios.get("/api/interviewers")
     ])
       .then((all) => {
-        dispatch({type: SET_APPLICATION_DATA, value: { days: all[0].data, appointments: all[1].data, interviewers: all[2].data}});
+        dispatch({ value: { days: all[0].data, appointments: all[1].data, interviewers: all[2].data}});
       })
       .catch((e) => console.log(e));
   }, []);
 
+  /**
+   * setDay - selects a given day in the week
+   * @param {*} day - the day to select
+   */
+  const setDay = function(day) {
+    return dispatch({ value: { day } })
+  };
+
+/**
+ * bookInterview - saves a new appointment, or edits an existing one
+ * @param {*} id - the id of the appointment to book
+ * @param {*} interview - an interview object to store
+ */
   function bookInterview(id, interview) {
-    const value = {}
-    if (!state.appointments[id].interview) {
-      value.days = state.days.map((day) => {
-        if (day.name === state.day) {
-          return {...day, spots: (day.spots - 1)}
-        }
-        return {...day};
-      });
-    }
-    
+    //create an appointment object to send to the server
     const appointment = {
       ...state.appointments[id],
       interview: { ...interview }
     };
-    
-    value.appointments = {
-      ...state.appointments,
-      [id]: appointment
-    };
+    //send the appointment
     return axios.put(`/api/appointments/${id}`, appointment)
-      .then(() => dispatch({ type: SET_ADD_INTERVIEW, value}))
+      .then(() => {
+        const value = {}
+        //change the number of spots if it is a new appointment
+        if (!state.appointments[id].interview) {
+          value.days = state.days.map((day) => {
+            if (day.name === state.day) {
+              return {...day, spots: (day.spots - 1)}
+            }
+            return {...day};
+          });
+        }
+        //recreate the list of objects with our new appointment
+        value.appointments = {
+          ...state.appointments,
+          [id]: appointment
+        };
+        //add value to the current state
+        dispatch({ value })
+      })
   };
 
+  /**
+   * cancelInterview - delete a given appointment
+   * @param {*} id - the id of the appointment to delete
+   */
   function cancelInterview(id) {
     let appointments = {...state.appointments};
     
+    //request that the server delete the appointment
     return axios.delete(`/api/appointments/${id}`)
     .then(() => {
+      //delete the interview data from client side data
       appointments[id].interview = null;
-      dispatch({ type: SET_REMOVE_INTERVIEW, value: { appointments }})
+      //update the number of spots available
+      let days = state.days.map((day) => {
+        if (day.name === state.day) {
+          return {...day, spots: (day.spots + 1)}
+        }
+        return {...day};
+      });
+      //store the updated data in state
+      dispatch({ value: { appointments, days }})
     })
   };
 

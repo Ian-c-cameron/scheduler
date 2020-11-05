@@ -3,6 +3,7 @@ import InterviewerListItem from "components/InterviewerListItem";
 import "components/InterviewerList.scss";
 import PropTypes from 'prop-types';
 
+//element displays interviewers to choose from when creating or editing an appointment
 export default function InterviewerList(props) {
   const InterviewerListItems = props.interviewers.map(interviewer => {
     return <InterviewerListItem 

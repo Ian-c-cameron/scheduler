@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames"
 import "components/InterviewerListItem.scss";
 
+//element displays a single interviewer
 export default function InterviewerListItem(props) {
   const InterviewerListClasses = classNames("interviewer-list__item",{
     "day-list__item--selected": props.selected

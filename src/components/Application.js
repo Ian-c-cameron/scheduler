@@ -6,9 +6,11 @@ import {getAppointmentsForDay, getInterview, getInterviewersForDay} from "helper
 
 import "components/Application.scss";
 
+//The main root element
 export default function Application(props) {
   const { state, setDay, bookInterview, cancelInterview } = useApplicationData();
 
+  //build the list of appointments and interviewers for the current day
   const appointments = getAppointmentsForDay(state, state.day);
   const interviewers = getInterviewersForDay(state, state.day);
   const schedule = appointments.map((appointment) => {

@@ -1,5 +1,7 @@
 import React from "react";
 
+//element provides a processing animation as a placeholder
+//while waiting for server requests
 export default function Status(props) {
   return (
     <main className="appointment__card appointment__card--status">

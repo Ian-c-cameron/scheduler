@@ -2,6 +2,7 @@ import React from "react";
 import classNames from "classnames"
 import "components/Button.scss";
 
+//element provides a button which the user may click
 export default function Button(props) {
   let buttonClass = classNames("button", {
     "button--confirm": props.confirm,
