@@ -5,13 +5,13 @@ Interview Scheduler is a single page browser application to allow students to sc
 ## Final Product
 
 Desktop Mode:
-!["Desktop Mode"](https://github.com/Ian-c-cameron/)
+!["Desktop Mode"](https://github.com/Ian-c-cameron/scheduler/blob/master/docs/desktop.png?raw=true)
 
 Phone Mode:
-!["Tablet Mode"](https://github.com/Ian-c-cameron/)
+!["Tablet Mode"](https://github.com/Ian-c-cameron/scheduler/blob/master/docs/phone.png?raw=true)
 
 Interview Booking
-!["Interview Booking"](https://github.com/Ian-c-cameron/)
+!["Interview Booking"](https://github.com/Ian-c-cameron/scheduler/blob/master/docs/booking.png?raw=true)
 
 
 ## Dependencies
