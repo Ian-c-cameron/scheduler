@@ -8,6 +8,7 @@ Desktop Mode:
 !["Desktop Mode"](https://github.com/Ian-c-cameron/scheduler/blob/master/docs/desktop.png?raw=true)
 
 Phone Mode:
+
 !["Tablet Mode"](https://github.com/Ian-c-cameron/scheduler/blob/master/docs/phone.png?raw=true)
 
 Interview Booking
